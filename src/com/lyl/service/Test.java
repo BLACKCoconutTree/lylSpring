@@ -10,7 +10,7 @@ public class Test {
 //        System.out.println((UserService) lylApplication.getBean("userService"));
 //        System.out.println((UserService) lylApplication.getBean("userService"));
 //        System.out.println((UserService) lylApplication.getBean("userService"));
-        UserService userService=(UserService) lylApplication.getBean("userService");
+        UserInterface userService=(UserInterface) lylApplication.getBean("userService");
         userService.test();
 
         System.out.println((OrderService) lylApplication.getBean("orderService"));

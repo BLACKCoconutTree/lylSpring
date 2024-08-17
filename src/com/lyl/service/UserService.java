@@ -4,7 +4,7 @@ import com.lyl.spring.*;
 
 @Component
 @Scope("singleton")
-public class UserService implements BeanNameAware , InitializingBean {
+public class UserService implements BeanNameAware, InitializingBean, UserInterface {
 
 
     private String beanName;
@@ -12,7 +12,7 @@ public class UserService implements BeanNameAware , InitializingBean {
     @Autowired
     private OrderService orderService;
 
-    public void test(){
+    public void test() {
         System.out.println(orderService);
         //
 
@@ -21,7 +21,7 @@ public class UserService implements BeanNameAware , InitializingBean {
 
     @Override
     public void setBeanName(String beanName) {
-        this.beanName=beanName;
+        this.beanName = beanName;
     }
 
     @Override

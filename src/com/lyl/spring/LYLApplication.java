@@ -6,12 +6,14 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class LYLApplication {
     private Class configClass;
     private final ConcurrentHashMap<String, BeanDefinition> beanDefinitionConcurrentHashMap = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, Object> singletonObject = new ConcurrentHashMap<>();
+    private final ArrayList<BeanPostProcessor> beanPostProcessorArrayList = new ArrayList<>();
 
     public LYLApplication(Class configClass) {
         this.configClass = configClass;
@@ -32,6 +34,11 @@ public class LYLApplication {
                             String className = absolutePath.substring(absolutePath.indexOf("com"), absolutePath.indexOf(".class"));
                             Class<?> clazz = classLoader.loadClass(className.replace("\\", "."));
                             if (clazz.isAnnotationPresent(Component.class)) {
+                                //
+                                if (BeanPostProcessor.class.isAssignableFrom(clazz)) {
+                                    beanPostProcessorArrayList.add((BeanPostProcessor) clazz.newInstance());
+                                }
+
                                 //知道这里定义了一个Bean
                                 //但是这个时候并不会去创建,因为单例和多例的bean的创建时间不一样
                                 BeanDefinition beanDefinition = new BeanDefinition();
@@ -52,6 +59,10 @@ public class LYLApplication {
 
                         }
                     } catch (ClassNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (InstantiationException e) {
+                        e.printStackTrace();
+                    } catch (IllegalAccessException e) {
                         e.printStackTrace();
                     }
                 }
@@ -81,12 +92,21 @@ public class LYLApplication {
                 }
             }
             //aware回调
-            if (bean instanceof BeanNameAware){
+            if (bean instanceof BeanNameAware) {
                 ((BeanNameAware) bean).setBeanName(beanName);
             }
+            //AOP
+            for (BeanPostProcessor beanPostProcessor : beanPostProcessorArrayList) {
+                bean = beanPostProcessor.postProcessorBeforeInitialization(beanName, bean);
+            }
+
             //初始化
-            if (bean instanceof InitializingBean){
+            if (bean instanceof InitializingBean) {
                 ((InitializingBean) bean).afterPropertiesSet();
+            }
+            //AOP
+            for (BeanPostProcessor beanPostProcessor : beanPostProcessorArrayList) {
+                bean = beanPostProcessor.postProcessorAfterInitialization(beanName, bean);
             }
 
             return bean;
