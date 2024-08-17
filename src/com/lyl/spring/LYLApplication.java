@@ -80,6 +80,15 @@ public class LYLApplication {
                     field.set(bean, getBean(field.getName()));
                 }
             }
+            //aware回调
+            if (bean instanceof BeanNameAware){
+                ((BeanNameAware) bean).setBeanName(beanName);
+            }
+            //初始化
+            if (bean instanceof InitializingBean){
+                ((InitializingBean) bean).afterPropertiesSet();
+            }
+
             return bean;
         } catch (InstantiationException e) {
             e.printStackTrace();
