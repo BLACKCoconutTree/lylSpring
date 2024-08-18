@@ -95,7 +95,7 @@ public class LYLApplication {
             if (bean instanceof BeanNameAware) {
                 ((BeanNameAware) bean).setBeanName(beanName);
             }
-            //AOP
+            //初始化前
             for (BeanPostProcessor beanPostProcessor : beanPostProcessorArrayList) {
                 bean = beanPostProcessor.postProcessorBeforeInitialization(beanName, bean);
             }
@@ -104,7 +104,7 @@ public class LYLApplication {
             if (bean instanceof InitializingBean) {
                 ((InitializingBean) bean).afterPropertiesSet();
             }
-            //AOP
+            //初始化后AOP
             for (BeanPostProcessor beanPostProcessor : beanPostProcessorArrayList) {
                 bean = beanPostProcessor.postProcessorAfterInitialization(beanName, bean);
             }
